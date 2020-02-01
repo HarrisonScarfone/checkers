@@ -12,6 +12,7 @@ class Board:
     def __init__(self):
         self._checker_positions = self.initial_piece_placement()
         self._hidden_board = None
+        self.location_map = self.generate_location_map()
 
     def __repr__(self):
         return 'A board object'
@@ -28,16 +29,34 @@ class Board:
             #     ['x', 'b', 'x', 'x', 'x', 'w', 'x', 'w'],
             #     ['b', 'x', 'b', 'x', 'x', 'x', 'w', 'x'],
             # ]
-            return [
-                ['x', 'b', 'x', 'x', 'x', 'w', 'x', 'w'],
-                ['b', 'x', 'b', 'x', 'x', 'x', 'w', 'x'],
-                ['x', 'b', 'x', 'x', 'x', 'w', 'x', 'w'],
-                ['b', 'x', 'b', 'x', 'x', 'x', 'w', 'x'],
-                ['x', 'x', 'x', 'b', 'x', 'w', 'x', 'w'],
-                ['b', 'x', 'b', 'x', 'b', 'x', 'w', 'x'],
-                ['x', 'x', 'x', 'x', 'x', 'w', 'x', 'w'],
-                ['b', 'x', 'b', 'x', 'x', 'x', 'w', 'x'],
-            ]
+            # return [
+            #     ['x', 'b', 'x', 'x', 'x', 'w', 'x', 'w'],
+            #     ['x', 'x', 'b', 'x', 'x', 'x', 'w', 'x'],
+            #     ['x', 'b', 'x', 'x', 'x', 'w', 'x', 'w'],
+            #     ['b', 'x', 'x', 'x', 'x', 'x', 'x', 'x'],
+            #     ['x', 'b', 'x', 'b', 'x', 'W', 'x', 'w'],
+            #     ['b', 'x', 'b', 'x', 'x', 'x', 'x', 'x'],
+            #     ['x', 'b', 'x', 'x', 'x', 'b', 'x', 'w'],
+            #     ['b', 'x', 'b', 'x', 'x', 'x', 'w', 'x'],
+            # ]
+            return [['x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'],
+                    ['x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'],
+                    ['x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'],
+                    ['x', 'x', 'b', 'x', 'b', 'x', 'x', 'x'],
+                    ['x', 'x', 'x', 'W', 'x', 'x', 'x', 'x'],
+                    ['x', 'x', 'b', 'x', 'b', 'x', 'x', 'x'],
+                    ['x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'],
+                    ['x', 'x', 'x', 'x', 'x', 'x', 'x', 'x']
+                ]
+
+    def generate_location_map(self):
+        location_map = {}
+        k = 0
+        for i in range(8):
+            for j in range(8):
+                location_map[k] = [i, j]
+                k = k + 1
+        return location_map
 
     def draw_board(self):
         print('  0   1   2   3   4   5   6   7')
@@ -85,6 +104,10 @@ class Board:
         for i in range(8):
             for j in range(8):
                 if self.get_piece_from_location(j, i).lower() == 'w':
+                    if self.get_piece_from_location(j, i) == 'W':
+                        if not jumps:
+                            moves = moves + self.can_move_down(j, i)
+                        jumps = jumps + self.can_attack_down(j, i)
                     if not jumps:
                         moves = moves + self.can_move_up(j, i)
                     jumps = jumps + self.can_attack_up(j, i)
@@ -146,10 +169,10 @@ class Board:
         else:
             piece_at_x_y = self.get_piece_from_location(x, y)
         opposite_piece = self.get_opposite_piece(piece_at_x_y)
-        if self.location_is_on_board(x - 1, y - 1) and self.get_piece_from_location(x - 1, y - 1) == opposite_piece:
+        if self.location_is_on_board(x - 1, y - 1) and self.get_piece_from_location(x - 1, y - 1).lower() == opposite_piece:
             if self.location_is_on_board(x - 2, y - 2) and [x - 2, y - 2] in self.can_move_up(x - 1, y - 1):
                 jumps.append([x-2, y-2])
-        if self.location_is_on_board(x + 1, y - 1) and self.get_piece_from_location(x + 1, y - 1) == opposite_piece:
+        if self.location_is_on_board(x + 1, y - 1) and self.get_piece_from_location(x + 1, y - 1).lower() == opposite_piece:
             if self.location_is_on_board(x + 2, y - 2) and [x + 2, y - 2] in self.can_move_up(x + 1, y - 1):
                 jumps.append([x + 2, y - 2])
         return jumps
@@ -161,13 +184,15 @@ class Board:
         else:
             piece_at_x_y = self.get_piece_from_location(x, y)
         opposite_piece = self.get_opposite_piece(piece_at_x_y)
-        if self.location_is_on_board(x - 1, y + 1) and self.get_piece_from_location(x - 1, y + 1) == opposite_piece:
-            if self.location_is_on_board(x - 2, y + 2) and [x - 2, y + 2] in self.can_move_up(x - 1, y + 1):
+        if self.location_is_on_board(x - 1, y + 1) and self.get_piece_from_location(x - 1, y + 1).lower() == opposite_piece:
+            if self.location_is_on_board(x - 2, y + 2) and [x - 2, y + 2] in self.can_move_down(x - 1, y + 1):
                 jumps.append([x-2, y+2])
-        if self.location_is_on_board(x + 1, y + 1) and self.get_piece_from_location(x + 1, y + 1) == opposite_piece:
-            if self.location_is_on_board(x + 2, y + 2) and [x + 2, y + 2] in self.can_move_up(x + 1, y + 1):
+        if self.location_is_on_board(x + 1, y + 1) and self.get_piece_from_location(x + 1, y + 1).lower() == opposite_piece:
+            if self.location_is_on_board(x + 2, y + 2) and [x + 2, y + 2] in self.can_move_down(x + 1, y + 1):
                 jumps.append([x + 2, y + 2])
         return jumps
+
+
 
 
 
