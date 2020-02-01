@@ -76,32 +76,44 @@ class Board:
             return 'b'
         return 'x'
 
+    def location_is_on_board(self, x, y):
+        if -1 < x < 8 and -1 < y < 8:
+            return True
+        return False
+
+    def get_all_white_moves(self):
+        moves = []
+        for i in range(8):
+            for j in range(8):
+                if self.get_piece_from_location(j, i).lower() == 'w':
+                    moves = moves + self.can_move_up(j, i)
+        return moves
+
+    def get_all_black_moves(self):
+        moves = []
+        for i in range(8):
+            for j in range(8):
+                if self.get_piece_from_location(j, i).lower() == 'b':
+                    moves = moves + self.can_move_down(j, i)
+        return moves
+
     def can_move_up(self, x, y):
+        moves = []
         piece_at_x_y = self.get_piece_from_location(x, y)
-        if piece_at_x_y == 'x':
-            return None
-        left, right = self.get_piece_from_location(x-1, y+1), self.get_piece_from_location(x+1, y+1)
-        if left == 'x' and right == 'x':
-            return[[x-1, y+1], [x+1, y+1]]
-        if left == 'x':
-            return [[x-1, y+1]]
-        if right == 'x':
-            return [[x+1, y+1]]
-        return None
+        if self.location_is_on_board(x - 1, y - 1) and self.get_piece_from_location(x - 1, y - 1) == 'x':
+            moves.append([x - 1, y - 1])
+        if self.location_is_on_board(x + 1, y - 1) and self.get_piece_from_location(x + 1, y - 1) == 'x':
+            moves.append([x + 1, y - 1])
+        return moves
 
     def can_move_down(self, x, y):
+        moves = []
         piece_at_x_y = self.get_piece_from_location(x, y)
-        if piece_at_x_y == 'x':
-            return None
-        left, right = self.get_piece_from_location(x-1, y+1), self.get_piece_from_location(x+1, y+1)
-        if left == 'x' and right == 'x':
-            return[[x-1, y-1], [x+1, y-1]]
-        if left == 'x':
-            return [[x-1, y-1]]
-        if right == 'x':
-            return [[x+1, y-1]]
-        return None
-
+        if self.location_is_on_board(x - 1, y + 1) and self.get_piece_from_location(x - 1, y + 1) == 'x':
+            moves.append([x - 1, y + 1])
+        if self.location_is_on_board(x + 1, y + 1) and self.get_piece_from_location(x + 1, y + 1) == 'x':
+            moves.append([x + 1, y + 1])
+        return moves
 
 
 
