@@ -37,3 +37,71 @@ blank board layout
                 ['x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'],
                 ['x', 'x', 'x', 'x', 'x', 'x', 'x', 'x']
             ]
+
+
+
+
+    ********************
+Old Functions
+*********************
+
+
+    def get_all_white_moves(self):
+        moves = {}
+        jumps = {}
+        terminating_jumps = {}
+        k = 0
+        for i in range(8):
+            for j in range(8):
+                if self.get_piece_from_location(j, i).lower() == 'w':
+                    if self.get_piece_from_location(j, i) == 'W':
+                        if not jumps:
+                            moves[k] = self.can_move_down(j, i)
+                        jumps[k] = self.can_attack_down(j, i)
+                    if not jumps:
+                        moves[k] = self.can_move_up(j, i)
+                    if jumps[k]:
+                        jumps[k] = jumps[k] + self.can_attack_up(j, i)
+                    else:
+                        jumps[k] = self.can_attack_up(j, i)
+                k = k + 1
+        if jumps:
+            while jumps:
+                jump = jumps.pop(0)
+                if self.can_attack_up(jump[0], jump[1], 'w'):
+                    for new_jump in self.can_attack_up(jump[0], jump[1], 'w'):
+                        jumps.append(new_jump)
+                else:
+                    terminating_jumps.append(jump)
+            return terminating_jumps
+        else:
+            return moves
+
+    def get_all_black_moves(self):
+        moves = {}
+        jumps = {}
+        k = 0
+        for i in range(8):
+            for j in range(8):
+                print(k)
+                if self.get_piece_from_location(j, i).lower() == 'b':
+                    if self.get_piece_from_location(j, i) == 'B':
+                        if not jumps:
+                            moves[k] = self.can_move_up(j, i)
+                        jumps[k] = self.can_attack_up(j, i)
+                    if not jumps:
+                        moves[k] = self.can_move_down(j, i)
+                    jumps[k] = self.can_attack_down(j, i)
+                k = k + 1
+        if jumps:
+            terminating_jumps = []
+            while jumps:
+                jump = jumps.pop(0)
+                if self.can_attack_up(jump[0], jump[1], 'w'):
+                    for new_jump in self.can_attack_up(jump[0], jump[1], 'w'):
+                        jumps.append(new_jump)
+                else:
+                    terminating_jumps.append(jump)
+            return terminating_jumps
+        else:
+            return moves
