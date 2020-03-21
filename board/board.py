@@ -3,262 +3,271 @@ For adaption to a different coordinate system later, make a function to flip som
 system to the coordinate system used in this program --- in case you forget :)
 '''
 
+
+class Move_List_Node():
+    def __init__(self, x, y, next_node=None):
+        self.x = x
+        self.y = y
+        self.next_node = next_node
+
 class Board:
 
     def __init__(self):
         self._checker_positions = self.initial_piece_placement()
-        self._hidden_board = None
-        self.location_map, self.reverse_location_map = self.generate_location_maps()
+        self.up_right = 'up_right'
+        self.up_left = 'up_left'
+        self.down_left = 'down_left'
+        self.down_right = 'down_right'
 
     def __repr__(self):
         return 'A board object'
 
     def initial_piece_placement(self, reset=False):
-        if not reset:
-            return [
-                ['x', 'b', 'x', 'x', 'x', 'w', 'x', 'w'],
-                ['b', 'x', 'b', 'x', 'x', 'x', 'w', 'x'],
-                ['x', 'b', 'x', 'x', 'x', 'w', 'x', 'w'],
-                ['b', 'x', 'b', 'x', 'x', 'x', 'w', 'x'],
-                ['x', 'b', 'x', 'x', 'x', 'w', 'x', 'w'],
-                ['b', 'x', 'b', 'x', 'x', 'x', 'w', 'x'],
-                ['x', 'b', 'x', 'x', 'x', 'w', 'x', 'w'],
-                ['b', 'x', 'b', 'x', 'x', 'x', 'w', 'x'],
-            ]
-            # return [
-            #     ['x', 'b', 'x', 'x', 'x', 'w', 'x', 'w'],
-            #     ['x', 'x', 'b', 'x', 'x', 'x', 'w', 'x'],
-            #     ['x', 'b', 'x', 'x', 'x', 'w', 'x', 'w'],
-            #     ['b', 'x', 'x', 'x', 'x', 'x', 'x', 'x'],
-            #     ['x', 'b', 'x', 'b', 'x', 'W', 'x', 'w'],
-            #     ['b', 'x', 'b', 'x', 'x', 'x', 'x', 'x'],
-            #     ['x', 'b', 'x', 'x', 'x', 'b', 'x', 'w'],
-            #     ['b', 'x', 'b', 'x', 'x', 'x', 'w', 'x'],
-            # ]
-            # return [['x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'],
-            #         ['x', 'x', 'x', 'x', 'x', 'x', 'b', 'x'],
-            #         ['x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'],
-            #         ['x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'],
-            #         ['x', 'x', 'x', 'W', 'x', 'x', 'x', 'x'],
-            #         ['x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'],
-            #         ['x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'],
-            #         ['x', 'x', 'x', 'x', 'x', 'x', 'x', 'x']
-            #     ]
+        return [
+            'x', 'b', 'x', 'b', 'x', 'b', 'x', 'b',
+            'b', 'x', 'b', 'x', 'b', 'x', 'b', 'x',
+            'x', 'b', 'x', 'b', 'x', 'b', 'x', 'b',
+            'w', 'x', 'w', 'x', 'x', 'x', 'x', 'x',
+            'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x',
+            'w', 'x', 'w', 'x', 'w', 'x', 'w', 'x',
+            'x', 'w', 'x', 'w', 'x', 'w', 'x', 'w',
+            'w', 'x', 'w', 'x', 'w', 'x', 'w', 'x',
+        ]
 
-    def generate_location_maps(self):
-        location_map = {}
-        reverse_location_map = {}
-        k = 0
-        for i in range(8):
-            for j in range(8):
-                location_map[k] = [j, i]
-                reverse_location_map['{}{}'.format(j, i)] = k
-                k = k + 1
-        return location_map, reverse_location_map
 
-    def draw_board(self):
-        print('  0   1   2   3   4   5   6   7')
-        for i in range(8):
-            print('+---+---+---+---+---+---+---+---+')
-            print('| {} | {} | {} | {} | {} | {} | {} | {} | {}'.format(
-                self.draw_peice(self.get_piece_from_location(0, i)),
-                self.draw_peice(self.get_piece_from_location(1, i)),
-                self.draw_peice(self.get_piece_from_location(2, i)),
-                self.draw_peice(self.get_piece_from_location(3, i)),
-                self.draw_peice(self.get_piece_from_location(4, i)),
-                self.draw_peice(self.get_piece_from_location(5, i)),
-                self.draw_peice(self.get_piece_from_location(6, i)),
-                self.draw_peice(self.get_piece_from_location(7, i)),
-                i
-            ))
-        print('+---+---+---+---+---+---+---+---+  ')
+    def index_to_x_y(self, index):
+        return index / 8, index % 8
 
-    def draw_locations(self):
-        for i in range(8):
-            print('+-----+-----+-----+-----+-----+-----+-----+-----+')
-            print('|  {}  |  {}  |  {}  |  {}  |  {}  |  {}  |  {}  |  {}  |'.format(
-                self.reverse_location_map['{}{}'.format(0, i)],
-                self.reverse_location_map['{}{}'.format(1, i)],
-                self.reverse_location_map['{}{}'.format(2, i)],
-                self.reverse_location_map['{}{}'.format(3, i)],
-                self.reverse_location_map['{}{}'.format(4, i)],
-                self.reverse_location_map['{}{}'.format(5, i)],
-                self.reverse_location_map['{}{}'.format(6, i)],
-                self.reverse_location_map['{}{}'.format(7, i)],
-            ))
-        print('+---+---+---+---+---+---+---+---+')
+    def x_y_to_index(self, x, y):
+        return x + y * 8
 
-    def flip_coordinates(self, x, y):
-        return y, x
+    def get_piece_from_index(self, index):
+        return self._checker_positions[index]
 
-    def get_piece_from_location(self, x, y):
-        return self._checker_positions[x][y]
-
-    def draw_peice(self, piece):
+    def draw_piece(self, index):
+        piece = self.get_piece_from_index(index)
         if piece == 'x':
             return ' '
         return piece
 
-    def get_opposite_piece(self, piece):
-        if piece.lower() == 'b':
-            return 'w'
-        if piece.lower() == 'w':
-            return 'b'
-        return 'x'
+    def draw_board(self):
+        print('    0   1   2   3   4   5   6   7', end='')
+        for index, piece in enumerate(self._checker_positions):
+            if index % 8 == 0:
+                print('\n  ---------------------------------')
+                print(f'{index // 8} |', end='')
+            print(f' {piece} |', end='')
+        print('\n   ---------------------------------')
 
-    def location_is_on_board(self, x, y):
-        if -1 < x < 8 and -1 < y < 8:
-            return True
-        return False
+    def draw_board_with_index_no_pieces(self):
+        print('    0    1    2    3    4    5    6    7', end='')
+        for index, piece in enumerate(self._checker_positions):
+            if index % 8 == 0:
+                print('\n  -----------------------------------------')
+                print(f'{index // 8} |', end='')
+            print(f' {index:02d} |', end='')
+        print('\n  -----------------------------------------')
 
+    def change_piece_at_index(self, index, change_to):
+        self._checker_positions[index] = change_to
 
-    def can_move_up(self, x, y):
+    def up_right_is_valid(self, index):
+        return index > 8 and (index + 1) % 8 != 0
+
+    def get_up_right_piece(self, index):
+        if self.up_right_is_valid(index):
+            return self.get_piece_from_index(index - 7)
+
+    def up_left_is_valid(self, index):
+        return index > 7 and index % 8 != 0
+
+    def get_up_left_piece(self, index):
+        if self.up_left_is_valid(index):
+            return self.get_piece_from_index(index - 9)
+
+    def down_right_is_valid(self, index):
+        return index < 56 and (index + 1) % 8 != 0
+
+    def get_down_right_piece(self, index):
+        if self.down_right_is_valid(index):
+            return self.get_piece_from_index(index + 9)
+
+    def down_left_is_valid(self, index):
+        return index < 56 and index % 8 != 0
+
+    def get_down_left_piece(self, index):
+        if self.down_left_is_valid(index):
+            return self.get_piece_from_index(index + 7)
+
+    def get_all_white_moves(self):
+
         moves = []
-        if self.location_is_on_board(x - 1, y - 1) and self.get_piece_from_location(x - 1, y - 1) == 'x':
-            moves.append([x - 1, y - 1])
-        if self.location_is_on_board(x + 1, y - 1) and self.get_piece_from_location(x + 1, y - 1) == 'x':
-            moves.append([x + 1, y - 1])
+
+        for index, piece in enumerate(self._checker_positions):
+            if piece.lower() == 'w':
+                isKing = self.get_piece_from_index(index).isupper()
+                up_left = self.get_up_left_piece(index)
+                up_right = self.get_up_right_piece(index)
+                if up_left:
+                    if up_left == 'x':
+                        moves.append((index, index - 9))
+                    if up_left.lower() == 'b':
+                        jump_to_square = self.get_up_left_piece(index - 9)
+                        if jump_to_square:
+                            moves.append((index, index - 9, index - 18))
+                if up_right:
+                    if up_right == 'x':
+                        moves.append((index, index - 7))
+                    if up_right.lower() == 'b':
+                        jump_to_square = self.get_up_right_piece(index - 7)
+                        if jump_to_square and jump_to_square == 'x':
+                            moves.append((index, index - 7, index - 14))
+                if isKing:
+                    down_left = self.get_down_left_piece(index)
+                    down_right = self.get_down_right_piece(index)
+                    if down_left:
+                        if down_left == 'x':
+                            moves.append((index, index + 7))
+                        if down_left.lower() == 'b':
+                            jump_to_square = self.get_down_left_piece(index + 7)
+                            if jump_to_square and jump_to_square == 'x':
+                                moves.append((index, index + 7, index + 14))
+                    if down_right:
+                        if down_right == 'x':
+                            moves.append((index, index + 9))
+                        if down_right.lower() == 'b':
+                            jump_to_square = self.get_down_right_piece(index + 9)
+                            if jump_to_square and jump_to_square == 'x':
+                                moves.append((index, index + 9, index + 18))
         return moves
 
-    def can_move_down(self, x, y):
+    def get_all_black_moves(self):
+
         moves = []
-        if self.location_is_on_board(x - 1, y + 1) and self.get_piece_from_location(x - 1, y + 1) == 'x':
-            moves.append([x - 1, y + 1])
-        if self.location_is_on_board(x + 1, y + 1) and self.get_piece_from_location(x + 1, y + 1) == 'x':
-            moves.append([x + 1, y + 1])
+
+        for index, piece in enumerate(self._checker_positions):
+            if piece.lower() == 'b':
+                isKing = self.get_piece_from_index(index).isupper()
+                down_left = self.get_down_left_piece(index)
+                down_right = self.get_down_right_piece(index)
+                if down_left:
+                    if down_left == 'x':
+                        moves.append((index, index + 7))
+                    if down_left.lower() == 'w':
+                        jump_to_square = self.get_down_left_piece(index + 7)
+                        if jump_to_square and jump_to_square == 'x':
+                            moves.append((index, index + 7, index + 14))
+                if down_right:
+                    if down_right == 'x':
+                        moves.append((index, index + 9))
+                    if down_right.lower() == 'w':
+                        jump_to_square = self.get_down_right_piece(index + 9)
+                        if jump_to_square and jump_to_square == 'x':
+                            moves.append((index, index + 9, index + 18))
+                if isKing:
+                    up_left = self.get_up_left_piece(index)
+                    up_right = self.get_up_right_piece(index)
+                    if up_left:
+                        if up_left == 'x':
+                            moves.append((index, index - 9))
+                        if up_left.lower() == 'w':
+                            jump_to_square = self.get_up_left_piece(index - 9)
+                            if jump_to_square and jump_to_square == 'x':
+                                moves.append((index, index - 9, index - 18))
+                    if up_right:
+                        if up_right == 'x':
+                            moves.append((index, index - 7))
+                        if up_right.lower() == 'w':
+                            jump_to_square = self.get_up_right_piece(index - 7)
+                            if jump_to_square and jump_to_square == 'x':
+                                moves.append((index, index - 7, index - 14))
         return moves
 
-    def can_attack_up(self, x, y, phantom_piece=None):
-        jumps = []
-        if phantom_piece:
-            piece_at_x_y = phantom_piece
-        else:
-            piece_at_x_y = self.get_piece_from_location(x, y)
-        opposite_piece = self.get_opposite_piece(piece_at_x_y)
-        if self.location_is_on_board(x - 1, y - 1) and self.get_piece_from_location(x - 1, y - 1).lower() == opposite_piece:
-            if self.location_is_on_board(x - 2, y - 2) and [x - 2, y - 2] in self.can_move_up(x - 1, y - 1):
-                jumps.append([x-2, y-2, self.reverse_location_map['{}{}'.format(x, y)]])
-        if self.location_is_on_board(x + 1, y - 1) and self.get_piece_from_location(x + 1, y - 1).lower() == opposite_piece:
-            if self.location_is_on_board(x + 2, y - 2) and [x + 2, y - 2] in self.can_move_up(x + 1, y - 1):
-                jumps.append([x + 2, y - 2, self.reverse_location_map['{}{}'.format(x, y)]])
-        return jumps
+    def get_black_move_from_index(self, index):
 
-    def can_attack_down(self, x, y, phantom_piece=None):
-        jumps = []
-        if phantom_piece:
-            piece_at_x_y = phantom_piece
-        else:
-            piece_at_x_y = self.get_piece_from_location(x, y)
-        opposite_piece = self.get_opposite_piece(piece_at_x_y)
-        if self.location_is_on_board(x - 1, y + 1) and self.get_piece_from_location(x - 1, y + 1).lower() == opposite_piece:
-            if self.location_is_on_board(x - 2, y + 2) and [x - 2, y + 2] in self.can_move_down(x - 1, y + 1):
-                jumps.append([x-2, y+2, self.reverse_location_map['{}{}'.format(x, y)]])
-        if self.location_is_on_board(x + 1, y + 1) and self.get_piece_from_location(x + 1, y + 1).lower() == opposite_piece:
-            if self.location_is_on_board(x + 2, y + 2) and [x + 2, y + 2] in self.can_move_down(x + 1, y + 1):
-                jumps.append([x + 2, y + 2, self.reverse_location_map['{}{}'.format(x, y)]])
-        return jumps
+        moves = []
 
-    def get_all_moves_white(self):
-        moves = {}
-        jumps = []
-        terminating_jumps = {}
-        k = 0
-        for i in range(8):
-            for j in range(8):
-                if self.get_piece_from_location(j, i).lower() == 'w':
-                    if self.get_piece_from_location(j, i) == 'W':
-                        if not jumps:
-                            moves[k] = self.can_move_down(j, i)
-                        jumps = jumps + self.can_attack_down(j, i)
-                    else:
-                        pass
-                    if not jumps:
-                        if k in moves:
-                            moves[k] = moves[k] + self.can_move_up(j, i)
-                        else:
-                            moves[k] = self.can_move_up(j, i)
-                    jumps = jumps + self.can_attack_up(j, i)
-                k = k + 1
-        if jumps:
-            while jumps:
-                jumps_to_add = []
-                jump = jumps.pop(0)
-                king_check = self.location_map[jump[2]]
-                if self.get_piece_from_location(king_check[0], king_check[1]) == 'W' and self.can_attack_down(jump[0], jump[1], 'w'):
-                    if len(jump) == 4 and jump[3] == 'down':
-                        for new_jump in self.can_attack_down(jump[0], jump[1], 'w'):
-                            jumps_to_add.append([new_jump[0], new_jump[1], jump[2], 'down'])
-                    if len(jump) == 3:
-                        for new_jump in self.can_attack_down(jump[0], jump[1], 'w'):
-                            jumps_to_add.append([new_jump[0], new_jump[1], jump[2], 'down'])
-                if self.can_attack_up(jump[0], jump[1], 'w'):
-                    if len(jump) == 4 and jump[3] == 'up':
-                        for new_jump in self.can_attack_up(jump[0], jump[1], 'w'):
-                            jumps_to_add.append([new_jump[0], new_jump[1], jump[2], 'up'])
-                    if len(jump) == 3:
-                        for new_jump in self.can_attack_up(jump[0], jump[1], 'w'):
-                            jumps_to_add.append([new_jump[0], new_jump[1], jump[2], 'up'])
-                if not jumps_to_add:
-                    if jump[2] in terminating_jumps:
-                        terminating_jumps[jump[2]] = terminating_jumps[jump[2]] + [jump[0], jump[1]]
-                    else:
-                        terminating_jumps[jump[2]] = [jump[0], jump[1]]
-                jumps = jumps + jumps_to_add
-            return terminating_jumps
-        else:
-            return moves
+        isKing = self.get_piece_from_index(index).isupper()
+        down_left = self.get_down_left_piece(index)
+        down_right = self.get_down_right_piece(index)
+        if down_left:
+            if down_left == 'x':
+                moves.append((index, index + 7))
+            if down_left.lower() == 'w':
+                jump_to_square = self.get_down_left_piece(index + 7)
+                if jump_to_square and jump_to_square == 'x':
+                    moves.append((index, index + 7, index + 14))
+        if down_right:
+            if down_right == 'x':
+                moves.append((index, index + 9))
+            if down_right.lower() == 'w':
+                jump_to_square = self.get_down_right_piece(index + 9)
+                if jump_to_square and jump_to_square == 'x':
+                    moves.append((index, index + 9, index + 18))
+        if isKing:
+            up_left = self.get_up_left_piece(index)
+            up_right = self.get_up_right_piece(index)
+            if up_left:
+                if up_left == 'x':
+                    moves.append((index, index - 9))
+                if up_left.lower() == 'w':
+                    jump_to_square = self.get_up_left_piece(index - 9)
+                    if jump_to_square and jump_to_square == 'x':
+                        moves.append((index, index - 9, index - 18))
+            if up_right:
+                if up_right == 'x':
+                    moves.append((index, index - 7))
+                if up_right.lower() == 'w':
+                    jump_to_square = self.get_up_right_piece(index - 7)
+                    if jump_to_square and jump_to_square == 'x':
+                        moves.append((index, index - 7, index - 14))
+        return moves
 
-    def get_all_moves_black(self):
-        moves = {}
-        jumps = []
-        terminating_jumps = {}
-        k = 0
-        for i in range(8):
-            for j in range(8):
-                if self.get_piece_from_location(j, i).lower() == 'b':
-                    if self.get_piece_from_location(j, i) == 'B':
-                        if not jumps:
-                            moves[k] = self.can_move_up(j, i)
-                        jumps = jumps + self.can_attack_up(j, i)
-                    else:
-                        pass
-                    if not jumps:
-                        if k in moves:
-                            moves[k] = moves[k] + self.can_move_down(j, i)
-                        else:
-                            moves[k] = self.can_move_down(j, i)
-                    jumps = jumps + self.can_attack_down(j, i)
-                k = k + 1
-        if jumps:
-            while jumps:
-                jumps_to_add = []
-                jump = jumps.pop(0)
-                king_check = self.location_map[jump[2]]
-                if self.get_piece_from_location(king_check[0], king_check[1]) == 'W' and self.can_attack_up(jump[0], jump[1], 'w'):
-                    if len(jump) == 4 and jump[3] == 'up':
-                        for new_jump in self.can_attack_up(jump[0], jump[1], 'b'):
-                            jumps_to_add.append([new_jump[0], new_jump[1], jump[2], 'up'])
-                    if len(jump) == 3:
-                        for new_jump in self.can_attack_up(jump[0], jump[1], 'b'):
-                            jumps_to_add.append([new_jump[0], new_jump[1], jump[2], 'up'])
-                if self.can_attack_down(jump[0], jump[1], 'b'):
-                    if len(jump) == 4 and jump[3] == 'down':
-                        for new_jump in self.can_attack_down(jump[0], jump[1], 'b'):
-                            jumps_to_add.append([new_jump[0], new_jump[1], jump[2], 'down'])
-                    if len(jump) == 3:
-                        for new_jump in self.can_attack_down(jump[0], jump[1], 'b'):
-                            jumps_to_add.append([new_jump[0], new_jump[1], jump[2], 'down'])
-                if not jumps_to_add:
-                    if jump[2] in terminating_jumps:
-                        terminating_jumps[jump[2]] = terminating_jumps[jump[2]] + [jump[0], jump[1]]
-                    else:
-                        terminating_jumps[jump[2]] = [jump[0], jump[1]]
-                jumps = jumps + jumps_to_add
-            return terminating_jumps
-        else:
-            return moves
+    def get_white_moves_from_index(self, index):
 
+        moves = []
 
+        isKing = self.get_piece_from_index(index).isupper()
+        up_left = self.get_up_left_piece(index)
+        up_right = self.get_up_right_piece(index)
+        if up_left:
+            if up_left == 'x':
+                moves.append((index, index - 9))
+            if up_left.lower() == 'b':
+                jump_to_square = self.get_up_left_piece(index - 9)
+                if jump_to_square:
+                    moves.append((index, index - 9, index - 18))
+        if up_right:
+            if up_right == 'x':
+                moves.append((index, index - 7))
+            if up_right.lower() == 'b':
+                jump_to_square = self.get_up_right_piece(index - 7)
+                if jump_to_square and jump_to_square == 'x':
+                    moves.append((index, index - 7, index - 14))
+        if isKing:
+            down_left = self.get_down_left_piece(index)
+            down_right = self.get_down_right_piece(index)
+            if down_left:
+                if down_left == 'x':
+                    moves.append((index, index + 7))
+                if down_left.lower() == 'b':
+                    jump_to_square = self.get_down_left_piece(index + 7)
+                    if jump_to_square and jump_to_square == 'x':
+                        moves.append((index, index + 7, index + 14))
+            if down_right:
+                if down_right == 'x':
+                    moves.append((index, index + 9))
+                if down_right.lower() == 'b':
+                    jump_to_square = self.get_down_right_piece(index + 9)
+                    if jump_to_square and jump_to_square == 'x':
+                        moves.append((index, index + 9, index + 18))
+        return moves
 
+    # this assumes that it is getting a valid move
+    def make_move(self, move_path):
+        self.change_piece_at_index(move_path[-1], self.get_piece_from_index(move_path[0]))
+        for move_location in move_path[:-1]:
+            self.change_piece_at_index(move_location, 'x')
 
-
+    def get_human_readable_move_path(self, move_path):
+        return [(index % 8, index // 8) for index in move_path]
