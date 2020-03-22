@@ -44,8 +44,8 @@ class Human_Vs_Computer:
             else:
                 break
 
-    def computer_player_turn(self):
-        if self.computer_player.color == 'white':
+    def computer_player_turn(self, player):
+        if player.color == 'white':
             possible_moves = self.game_board.get_all_white_moves()
         else:
             possible_moves = self.game_board.get_all_black_moves()
@@ -53,29 +53,30 @@ class Human_Vs_Computer:
             check_for_jumps = [move for move in possible_moves if len(move) > 2]
             if check_for_jumps:
                 possible_moves = check_for_jumps
-            move_selection = self.computer_player.make_move(possible_moves)
-            self.game_board.make_move(possible_moves[move_selection])
-            if len(possible_moves[move_selection]) > 2:
-                if self.computer_player.color == 'white':
-                    possible_moves = self.game_board.check_for_white_additional_jump(possible_moves[move_selection][-1])
+            move_selection = player.make_move(possible_moves)
+            print(possible_moves)
+            print(move_selection)
+            self.game_board.make_move(move_selection)
+            if len(move_selection) > 2:
+                if player.color == 'white':
+                    possible_moves = self.game_board.check_for_white_additional_jump(move_selection[-1])
                 else:
-                    possible_moves = self.game_board.check_for_black_additional_jump(possible_moves[move_selection][-1])
-                if possible_moves:
-                    print('You must continue jumping.')
-                    self.game_board.draw_board()
+                    possible_moves = self.game_board.check_for_black_additional_jump(move_selection[-1])
+            else:
+                break
 
     def run_game(self):
         while not self.game_over:
             self.game_board.draw_board()
             if self.whos_turn_is_it == 'black':
                 if self.computer_player.color == 'black':
-                    self.computer_player_turn()
+                    self.computer_player_turn(self.computer_player)
                 else:
                     self.human_player_turn()
                 self.whos_turn_is_it = 'white'
             elif self.whos_turn_is_it == 'white':
                 if self.computer_player.color == 'white':
-                    self.computer_player_turn()
+                    self.computer_player_turn(self.computer_player)
                 else:
                     self.human_player_turn()
                 self.whos_turn_is_it = 'black'
