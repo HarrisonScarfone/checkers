@@ -36,9 +36,8 @@ game manager for training, try the nn game manager instead.
             human_color = input('Enter number for human color: ')
             computer_color = input('Enter number for computer color: ')
             try:
-                if int(human_color) in [0, 1] and int(computer_color) in [0, 1]:
-                    return int(human_color), int(computer_color)
-                    break
+                return self.color_options[int(human_color)], self.color_options[int(computer_color)]
+                break
             except ValueError:
                 print('Invalid Selections.')
 
