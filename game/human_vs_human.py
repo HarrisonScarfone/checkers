@@ -1,6 +1,6 @@
 from game.board import Board
 
-class Game_Manager:
+class Human_Vs_Human:
 
     def __init__(self):
         self.game_board = Board()

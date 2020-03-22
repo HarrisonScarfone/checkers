@@ -1,10 +1,5 @@
-from game.game_manager import Game_Manager
-from game.board import Board
+from game_managers.human_interface import Human_Interface
 
-gm = Game_Manager()
+manager = Human_Interface()
 
-gm.run_game()
-
-# b = Board()
-#
-# b.draw_board_with_index_no_pieces()
+manager.run()
